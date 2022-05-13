@@ -1,3 +1,4 @@
+
 # Human Face Attributes Recognition(HFAR)
 
 > 数据集来自[FS2K](https://github.com/DengPingFan/FS2K)
@@ -45,7 +46,6 @@ HFAR
 
 We extract Hair, Gender, Earring, Smile, Frontal_Face, Style from the attributes marked by FS2K as the six recognition tasks of this suite. The specific annotations are as follows:
 
-![attributes](README.assets/attributes.png)
 
 #### Annotations
 
@@ -81,7 +81,7 @@ We extract Hair, Gender, Earring, Smile, Frontal_Face, Style from the attributes
 #### Attributes Count
 
 |   FS2K    | w/ H | w/o H |  M   |  F   | w/ E | w/o E | w/ S | w/o S | w/ F | w/o F |  S1  |  S2  |  S3  |
-| :-------: | :--: | :---: | :--: | :---: | :--: | :--: | :--: | :--: | :--: | :---: | :--: | :---: | :--: | :---: | :--: | :--: | :--: |
+| :-------: | :--: | :---: | :--: | :--: | :--: | :---: | :--: | :---: | :--: | :---: | :--: | :--: | :--: |
 | **Train** | 1010 |  48  | 574  | 484  | 209  |  849  | 645  |  413  | 917  |  141  | 357  | 351  | 350  |
 | **Test**  | 994  |  52  | 632  | 414  | 187  |  859  | 670  |  376  | 872  |  174  | 619  | 381  |  46  |
 
