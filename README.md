@@ -2,9 +2,13 @@
 # Human Face Attributes Recognition(HFAR)
 
 > 数据集来自[FS2K](https://github.com/DengPingFan/FS2K)
+
 > 针对素描人像的属性识别任务构建的基于Pytorch, Sklearn, Numpy及Pandas等框架的网络模型
+
 > Dataset from [FS2K](https://github.com/DengPingFan/FS2K)
+
 > A network model based on frameworks such as Pytorch, Sklearn, Numpy and Pandas built for the attribute recognition task of sketch portraits
+
 
 ### Introduction:
 
@@ -91,6 +95,7 @@ We extract Hair, Gender, Earring, Smile, Frontal_Face, Style from the attributes
 + S = 带**微笑**或不带微笑。
 + F = **正面面部** 或面部 > 30 度。
 + S (1 / 2 / 3) = **风格**1 / 风格2 / 风格3。
+
 + H = **Hair Visible** or not.
 + **Gender**: Male / Female.
 + E = With **Earring** or without Earring.
