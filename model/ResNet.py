@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-
+import torchvision.models as models
 class RestNetBasicBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride):
         super(RestNetBasicBlock, self).__init__()
@@ -93,5 +93,38 @@ class ResNet18(nn.Module):
         Style_preds = self.Style_Classfier(x)
         #[b,3]
         return F.log_softmax(preds,dim=1),F.log_softmax(Style_preds,dim=1)
-
-
+def forward(self,x):
+    x = self.relu(self.bn1(self.conv1(x)))
+    x = self.maxpool(x)
+    x = self.layer1(x)
+    x = self.layer2(x)
+    x = self.layer3(x)
+    x = self.layer4(x)
+    x = self.avgpool(x)
+    x = x.view(x.size(0), -1)
+    Hair_preds = self.Hair_Classfier(x).unsqueeze(0)
+    Gender_preds = self.Gender_Classfier(x).unsqueeze(0)
+    Ear_preds = self.Ear_Classfier(x).unsqueeze(0)
+    Smile_preds = self.Smile_Classfier(x).unsqueeze(0)
+    Frontal_preds = self.Frontal_Classfier(x).unsqueeze(0)
+    preds = torch.cat((Hair_preds, Gender_preds, Ear_preds, Smile_preds, Frontal_preds), dim=0)
+    # [5,b,2]
+    Style_preds = self.Style_Classfier(x)
+    # [b,3]
+    return F.log_softmax(preds, dim=1), F.log_softmax(Style_preds, dim=1)
+def Load_Model_Resnet18(pretrained=False):
+    if pretrained:
+        model = models.resnet18(pretrained=True)
+        #innum = model.fc.in_features
+        #model.fc = nn.Linear(innum, 256)
+        model.Hair_Classfier = nn.Sequential(nn.Linear(512, 256), nn.Linear(256, 128), nn.Linear(128, 2))
+        model.Gender_Classfier = nn.Sequential(nn.Linear(512, 256), nn.Linear(256, 128), nn.Linear(128, 2))
+        model.Ear_Classfier = nn.Sequential(nn.Linear(512, 256), nn.Linear(256, 128), nn.Linear(128, 2))
+        model.Smile_Classfier = nn.Sequential(nn.Linear(512, 256), nn.Linear(256, 128), nn.Linear(128, 2))
+        model.Frontal_Classfier = nn.Sequential(nn.Linear(512, 256), nn.Linear(256, 128), nn.Linear(128, 2))
+        model.Style_Classfier = nn.Sequential(nn.Linear(512, 256), nn.Linear(256, 128), nn.Linear(128, 3))
+        model.forward = forward
+        return model
+    else:
+        model = ResNet18()
+        return model
