@@ -42,6 +42,17 @@ HFAR
 └── README.pdf
 ```
 
+### Python/Conda Module Requirements(套件模块依赖)
+```
+Pytorch==1.9.0
+torchvision==0.10.0
+numpy==1.22.3
+pandas==1.3.4
+sklearn==1.0.1
+matplotlib==3.4.3
+argparse==1.1
+```
+
 ### Attributes
 
 我们从FS2K标注的多项属性中提取出Hair,Gender,Earring,Smile,Frontal_Face,Style共六类属性作为本套件的六项识别任务，具体标注如下：
@@ -93,6 +104,8 @@ We extract Hair, Gender, Earring, Smile, Frontal_Face, Style from the attributes
 + S = 带**微笑**或不带微笑。
 + F = **正面面部** 或面部 > 30 度。
 + S (1 / 2 / 3) = **风格**1 / 风格2 / 风格3。
++ Count = 数据集个数
+
 
 + H = **Hair Visible** or not.
 + **Gender**: Male / Female.
@@ -100,6 +113,7 @@ We extract Hair, Gender, Earring, Smile, Frontal_Face, Style from the attributes
 + S = With **Smile** or without Smile.
 + F = **Frontal Face** or Face > 30 degrees.
 + S (1 / 2 / 3) = **Style**1 / Style2 / Style3.
++ Count = number of datasets
 
 ### Tools
 
