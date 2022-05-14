@@ -96,7 +96,7 @@ def Confusion_Matrix_Plot(outputs,labels,style_output,style_label,epoch):#output
         plt.show()
 
     #style属性单独拎出来
-    CM = confusion_matrix(style_gt, style_pred, normalize='all')  # labels=attribute_selection
+    CM = confusion_matrix(style_gt, style_pred)  #normalize='all' labels=attribute_selection
     attribute_selection = ['S1','S2','S3']
     plt.matshow(CM, cmap=plt.cm.YlGn)  # Reds
     plt.colorbar()  # 显示颜色条
