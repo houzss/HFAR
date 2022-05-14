@@ -20,9 +20,9 @@ Based on the sketch portrait data of the FS2K dataset, I used the Pytorch framew
 
 The entire framework file structure is as follows:
 
-文件夹HFAR下含data，model和tool三个子文件夹。data文件夹包含了从FS2K中整合的图片数据和训练、测试集属性标注文件；model文件夹包含了使用nn.module类实现的Resnet18残差网络模型结构；tool文件夹包含了本套件使用到的代码文件，data_prepare.py用于从FS2K数据集中整合成本套件所需的数据集（即生成data文件夹下所有数据文件），datasets.py实现定制DataSets类型供模型使用，train.py用于模型训练测试，utils.py包含了定制的DataLoader类，评估模型用的各项指标如Precision, Average Precision 和mAP，混淆矩阵等。
+文件夹HFAR下含data，model和tool三个子文件夹。data文件夹包含了从FS2K中整合的图片数据和训练、测试集属性标注文件；model文件夹包含了使用nn.module类实现的Resnet18残差网络模型结构；tool文件夹包含了本套件使用到的代码文件，data_prepare.py用于从FS2K数据集中整合成本套件所需的数据集（即生成data文件夹下所有数据文件），datasets.py实现定制DataSets类型供模型使用，train.py用于模型训练测试，train.sh用于在shell环境下比较不同优化器和模型有无预训练参数对精度的影响，utils.py包含了定制的DataLoader类，评估模型用的各项指标如Precision, Average Precision 和mAP，混淆矩阵等。
 
-The folder HFAR contains three subfolders, data, model and tool. The data folder contains the image data and training and test set attribute annotation files integrated from FS2K; the model folder contains the Resnet18 residual network model structure implemented using the nn.module class; the tool folder contains the tools used in this suite The code file, data_prepare.py is used to integrate the datasets required by the cost suite from the FS2K dataset (that is, to generate all data files in the data folder), datasets.py implements custom DataSets types for model use, train.py is used for model training For testing, utils.py contains a custom DataLoader class, which evaluates various indicators used by the model such as Precision, Average Precision and mAP, Confusion Matrix, etc.
+The folder HFAR contains three subfolders, data, model and tool. The data folder contains the image data and training and test set attribute annotation files integrated from FS2K; the model folder contains the Resnet18 residual network model structure implemented using the nn.module class; the tool folder contains the tools used in this suite The code file, data_prepare.py is used to integrate the datasets required by the cost suite from the FS2K dataset (that is, to generate all data files in the data folder), datasets.py implements custom DataSets types for model use, train.py is used for model training For testing, train.sh is used to compare the impact of different optimizers and models with or without pre-training parameters on the accuracy in the shell environment, utils.py contains a custom DataLoader class, which evaluates various indicators used by the model such as Precision, Average Precision and mAP, Confusion Matrix, etc.
 
 ```
 HFAR
@@ -36,15 +36,13 @@ HFAR
 ├── tool
 │       ├── data_prepare.py (prepare datasets from FS2K)
 │       ├── datasets.py     (custom datasets)
-│       └── train.py        (Task training codes)
+│       ├── train.py        (Task training codes)
+│       ├── train.sh        (Task training shell codes)
 │       └── utils.py        (DataLoader, Evaluation codes)      
 └── README.pdf
 ```
 
 ### Attributes
-
-
-## Attributes
 
 我们从FS2K标注的多项属性中提取出Hair,Gender,Earring,Smile,Frontal_Face,Style共六类属性作为本套件的六项识别任务，具体标注如下：
 
@@ -84,7 +82,7 @@ We extract Hair, Gender, Earring, Smile, Frontal_Face, Style from the attributes
 
 #### Attributes Count
 
-|   FS2K    | w/ H | w/o H |  M   |  F   | w/ E | w/o E | w/ S | w/o S | w/ F | w/o F |  S1  |  S2  |  S3  | Count|
+|   FS2K    | w/ H | w/o H |  M   |  F   | w/ E | w/o E | w/ S | w/o S | w/ F | w/o F |  S1  |  S2  |  S3  | Count |
 | :-------: | :--: | :---: | :--: | :--: | :--: | :---: | :--: | :---: | :--: | :---: | :--: | :--: | :--: | :---: |
 | **Train** | 1010 |  48  | 574  | 484  | 209  |  849  | 645  |  413  | 917  |  141  | 357  | 351  | 350  | 1058 |
 | **Test**  | 994  |  52  | 632  | 414  | 187  |  859  | 670  |  376  | 872  |  174  | 619  | 381  |  46  | 1058 |
@@ -112,3 +110,22 @@ We extract Hair, Gender, Earring, Smile, Frontal_Face, Style from the attributes
 + Put the *FS2K dataset* in this folder.
 + Run `tool/data_prepare.py` to split the whole dataset into training part and test part.
 + Run `tool/train.py` to train the models and get test result.
+
+##### 注：如果要运行train.sh文件，需先在主目录下建立result和tmp文件夹。result下应包含no_pre_trained和pre_trained两个文件夹，且这两个文件夹下应都有Adam,RMSprop,SGD三个子文件夹；tmp下应包含存放训练模型的文件夹model_param
+##### Note: If you want to run the train.sh file, you need to create the result and tmp folders in the main directory first. The result should contain two folders no_pre_trained and pre_trained, and there should be three subfolders Adam, RMSprop, SGD under these two folders; tmp should contain the folder model_param for storing the training model
+
+### 参考文献
+
+1、[He K , Zhang X , Ren S , et al. Deep Residual Learning for Image Recognition[J]. IEEE, 2016.](https://arxiv.org/abs/1512.03385)
+
+2、WELCOME TO PYTORCH TUTORIALS, https://pytorch.org/tutorials/
+
+3、AP和mAP 计算, https://blog.csdn.net/mr_muli/article/details/101616406
+
+4、利用python绘制混淆矩阵, https://blog.csdn.net/weixin_43818631/article/details/121309660
+
+5、PyTorch实现ResNet18, https://blog.csdn.net/weixin_36979214/article/details/108879684
+
+6、Python中的format方法, https://blog.csdn.net/a1786742005/article/details/89388093
+
+7、Python使用 plt.savefig 保存图片时是空白图片怎么解决, https://blog.csdn.net/tianxinyiru/article/details/121403165

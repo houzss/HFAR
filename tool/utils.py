@@ -64,7 +64,7 @@ def mAP(outputs,labels):#这个方法是求Average_Precision_score 不适合Styl
     for name, val in zip(list(attribute_Dict.keys()),AP[:-1]):
         res['AP'][name] = val
     return res
-def Confusion_Matrix_Plot(outputs,labels,style_output,style_label):#outputs:[attributes_num,batch_size,value_dim], labels:[attributes_num,batch_size]
+def Confusion_Matrix_Plot(outputs,labels,style_output,style_label,epoch):#outputs:[attributes_num,batch_size,value_dim], labels:[attributes_num,batch_size]
     outputs = outputs.max(dim=-1)[1]  # 按最后一维求最大值，其中result[0]为最大值的Tensor，result[1]为最大值对应的index的Tensor。
     preds = outputs.cpu().detach().numpy()  # preds:[attributes_num,batch_size]
     gts = labels.cpu().detach().numpy()  # gts:[attributes_num,batch_size]
@@ -79,7 +79,9 @@ def Confusion_Matrix_Plot(outputs,labels,style_output,style_label):#outputs:[att
         plt.colorbar()#显示颜色条
         for i in range(len(CM)):
             for j in range(len(CM)):
-                plt.annotate("{:.4f}".format(CM[i,j]), xy=(i,j), horizontalalignment='center', verticalalignment='center')
+                plt.annotate(CM[i, j], xy=(i, j), horizontalalignment='center',
+                             verticalalignment='center')
+                #plt.annotate("{:.4f}".format(CM[i,j]), xy=(i,j), horizontalalignment='center', verticalalignment='center')
         tick_marks = np.arange(len(attribute_selection))
         plt.xticks(tick_marks,attribute_selection)#rotation=25
         plt.yticks(tick_marks,attribute_selection,rotation=90)
@@ -90,8 +92,9 @@ def Confusion_Matrix_Plot(outputs,labels,style_output,style_label):#outputs:[att
         # plt.xlabel('Predicted label', fontdict={'family': 'Times New Roman', 'size': 20})
         title = 'Confusion Matrix for {}'.format(attr.replace('_',' '))
         plt.title(title,fontdict={'family': 'Times New Roman', 'size': 18})
-        plt.figure(figsize=(6,6))
+        plt.savefig('../tmp/' + str(epoch) + '_' + attr + '.png')#需先保存图片再show()
         plt.show()
+
     #style属性单独拎出来
     CM = confusion_matrix(style_gt, style_pred, normalize='all')  # labels=attribute_selection
     attribute_selection = ['S1','S2','S3']
@@ -110,8 +113,9 @@ def Confusion_Matrix_Plot(outputs,labels,style_output,style_label):#outputs:[att
     # plt.xlabel('Predicted label', fontdict={'family': 'Times New Roman', 'size': 20})
     title = 'Confusion Matrix for Style'
     plt.title(title, fontdict={'family': 'Times New Roman', 'size': 18})
-    plt.figure(figsize=(6, 6))
+    plt.savefig('../tmp/' + str(epoch) + '_style.png')
     plt.show()
+
 '''
 style_preds = torch.rand((16,3))
 style_labels = torch.cat((torch.ones((1,5)),torch.zeros((1,5)),torch.ones((1,6))+torch.ones((1,6))),dim=1)

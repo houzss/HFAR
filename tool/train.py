@@ -4,10 +4,16 @@ import numpy as np
 import torch
 from torch import nn
 import torch.optim as optim
-
+import os
 from utils import Load_SketchData,Precision,Average_Precision,Confusion_Matrix_Plot
-from model.ResNet import ResNet18
-import torchvision.models as models
+import sys
+sys.path.append('../')
+from model.ResNet import Load_Model_Resnet18
+
+
+
+log_fp = open('../tmp/train_log.txt','w',encoding='utf8')
+
 attribute_Dict = {"hair": ["w/ H", "w/o H"], "gender": ["male", "female"],
                       "earring": ["w/ E", "w/o E"], "smile": ["w/ S", "w/o S"],
                       "frontal_face": ["<=30 D", ">30 D"],"style": ["Style1", "Style2", "Style3"]}
@@ -15,7 +21,7 @@ attribute_Dict = {"hair": ["w/ H", "w/o H"], "gender": ["male", "female"],
 parser = argparse.ArgumentParser()
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='Disables CUDA training.')
-parser.add_argument('--pre_trained', action='store_true', default=False,
+parser.add_argument('--pre_trained', action='store_true', default=True,
                     help='if use pre_trained model.')
 parser.add_argument('--seed', type=int, default=42, help='Random seed.')
 parser.add_argument('--epochs', type=int, default=100,
@@ -47,12 +53,9 @@ train_dataloader,test_dataloader = Load_SketchData(batch_size=args.batch_size)#[
 #train_features, train_labels = next(iter(train_dataloader))
 #train_features.shape:(64,3,250,250)(B,C,H,W) train_labels.shape:(6,64)(attribute_num,Batch_size)
 #Load Model
-if args.pre_trained:#这里预训练的没写完，有兴趣继续钻研一下（就改写一下输出部分）
-    model = models.resnet18(pretrained=True)
-    innum = model.fc.in_features
-    model.fc = nn.Linear(innum,256)
-else:
-    model = ResNet18()
+
+
+model = Load_Model_Resnet18(pretrained=args.pre_trained)
 ''''''
 #Load Optimizer
 if args.optim == 'Adam':
@@ -66,7 +69,7 @@ loss_fn = nn.CrossEntropyLoss()
 model = model.to(device)
 loss_fn = loss_fn.to(device)
 
-def train_loop(dataloader, model, loss_fn, optimizer):
+def train_loop(dataloader, model, loss_fn, optimizer,epoch):
     train_time = time.time()
     model.train()
     optimizer.zero_grad()
@@ -75,7 +78,10 @@ def train_loop(dataloader, model, loss_fn, optimizer):
         X,y = X.to(device),y.T.to(device)
         # Compute prediction and loss
         train_batch_time = time.time()
-        preds,style_pred = model(X)#preds.shape:(5,16,2) styple_pred.shape:(16,3)
+        if args.pre_trained:
+            preds,style_pred = model(model,X)#preds.shape:(5,16,2) styple_pred.shape:(16,3)
+        else:
+            preds, style_pred = model(X)
         for i in range(preds.size(0)):
             if i==0:
                 loss = loss_fn(preds[i], y[i])
@@ -90,8 +96,8 @@ def train_loop(dataloader, model, loss_fn, optimizer):
         if batch:
             loss, current = loss.item(), batch * args.batch_size
             print(f"Batch:{batch:>2d} loss: {loss:>7f}  [{current:>5d}/{size:>5d}]  time:{time.time() - train_batch_time:.4f}")
-    print(f"train epoch time: {time.time()-train_time:.4f}")
-
+    print(f" epoch:{epoch} train time: {time.time()-train_time:.4f}")
+    log_fp.write(f"Epoch:{epoch} train time: {time.time()-train_time:.4f}\t")
 
 
 def test_loop(dataloader, model, loss_fn,epoch):
@@ -99,7 +105,10 @@ def test_loop(dataloader, model, loss_fn,epoch):
     with torch.no_grad():
         for batch,(X, y) in enumerate(dataloader):#y.shape:(6,64)
             X, y = X.to(device), y.T.to(device)
-            preds,style_pred = model(X)#preds.shape:(5,64,2) styple_pred.shape:(64,3)
+            if args.pre_trained:
+                preds, style_pred = model(model, X)  # preds.shape:(5,16,2) styple_pred.shape:(16,3)
+            else:
+                preds, style_pred = model(X)
             W_Preds = preds if batch==0 else torch.cat((W_Preds,preds),dim=1)
             WS_Preds = style_pred if batch==0 else torch.cat((WS_Preds,style_pred),dim=0)
             W_Y = y if batch==0 else torch.cat((W_Y,y),dim=1)
@@ -119,16 +128,18 @@ def test_loop(dataloader, model, loss_fn,epoch):
         for i in range(W_Preds.size(0)):
             AP_list.append(Average_Precision(W_Preds[i],W_Y[i]).item())
         AP_list.append(Average_Precision(WS_Preds,W_Y[5]).item())
-    Test_res = "Test Epoch{}: \n P:".format(epoch) +str(P_list) +"\nAP:"+str(AP_list) +"\n loss: {:>8f}, time: {:.4f}s\n".format(avg_loss,time.time() - test_time)
+    Test_res = "Epoch{}: \n P:".format(epoch) +str(P_list) +"\nAP:"+str(AP_list) +"\n loss: {:>8f}, time: {:.4f}s\n".format(avg_loss,time.time() - test_time)
+    log_test = "P:".format(epoch) +str(P_list) +"\nAP:"+str(AP_list) +"\n loss: {:>8f}, time: {:.4f}s\n".format(avg_loss,time.time() - test_time)
     print(Test_res)
-    if(epoch==args.epochs):
-        Confusion_Matrix_Plot(W_Preds, W_Y[:5], WS_Preds, W_Y[5])
-
-
+    log_fp.write(log_test)
+    if epoch and (epoch%100==0 or epoch==args.epochs):#不为0且是100的倍数或已经到最后一个epochs
+        Confusion_Matrix_Plot(W_Preds, W_Y[:5], WS_Preds, W_Y[5], epoch)
+        torch.save(model,'../tmp/model_param/'+str(epoch)+'.pth')
 
 
 for t in range(args.epochs):
     print(f"Epoch {t+1}\n-------------------------------")
-    train_loop(train_dataloader, model, loss_fn, optimizer)
+    train_loop(train_dataloader, model, loss_fn, optimizer,t+1)
     test_loop(test_dataloader, model, loss_fn,t+1)
 print("Done!")
+log_fp.close()
