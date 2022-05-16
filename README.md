@@ -69,9 +69,6 @@ We extract Hair, Gender, Earring, Smile, Frontal_Face, Style from the attributes
 	"hair": 0,
 	# 0: with hair, 1: without hair.
 
-	"hair_color": 2,
-	# 0: brown, 1: black, 2: red, 3: no-hair, 4: golden.
-
 	"gender": 0,
 	# 0: male, 1: female.
 
@@ -127,6 +124,15 @@ We extract Hair, Gender, Earring, Smile, Frontal_Face, Style from the attributes
 
 ##### 注：如果要运行train.sh文件，需先在主目录下建立result和tmp文件夹。result下应包含no_pre_trained和pre_trained两个文件夹，且这两个文件夹下应都有Adam,RMSprop,SGD三个子文件夹；tmp下应包含存放训练模型的文件夹model_param
 ##### Note: If you want to run the train.sh file, you need to create the result and tmp folders in the main directory first. The result should contain two folders no_pre_trained and pre_trained, and there should be three subfolders Adam, RMSprop, SGD under these two folders; tmp should contain the folder model_param for storing the training model
+
+### Training Result
+我对有无预训练的Resnet18网络模型分别采用Adam、SGD和RMSprop三种不同优化器训练100个epoch（其中未预训练的Resnet18网络模型训练1000个epoch），结果为：
+
+![eval result](eval.png)
+
+1、SGD随机梯度下降优化器对本次素描肖像人脸属性识别任务更合适，无论是pre_trained过的Resnet18模型使用3种优化器训练100个epoch的精度结果还是no_pretrained过的Resnet18模型经100和1000个epoch的精度结果，SGD的精度总是最高。(分析原因：数据集小，SGD更适用)
+
+2、从有无经过预训练的Resnet18模型训练100个epoch的精度对比上看，没有经过预训练的模型在100个epoch后也能达到高精度分类结果(分析原因：数据集简单)
 
 ### 参考文献
 
