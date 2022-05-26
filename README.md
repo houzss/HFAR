@@ -1,5 +1,8 @@
 
 # Human Face Attributes Recognition(HFAR)
+> 深度学习课程作业，为防重同窗请勿直接使用，Author: ZHS-Houzss，问题咨询联系(houzss1@gmail.com)
+
+> Deep learning coursework, to prevent plagiarism, classmates should not use it directly, Author: ZHS-Houzss, contact for inquiries (houzss1@gmail.com)
 
 > 数据集来自[FS2K](https://github.com/DengPingFan/FS2K)
 
